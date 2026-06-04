@@ -12,10 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('kartu_anggota', function (Blueprint $table) {
-            $table->integer('id_kartu', true);
-            $table->string('nomor_kartu', 20)->unique('nomor_kartu');
+            $table->id('id_kartu');
+            $table->string('nomor_kartu', 20)->unique();
             $table->date('tanggal_pembuatan');
-            $table->integer('id_user')->nullable()->unique('id_user');
+
+            $table->foreignId('id_user')
+                ->nullable()
+                ->unique()
+                ->constrained('users')
+                ->onUpdate('restrict')
+                ->onDelete('cascade');
         });
     }
 

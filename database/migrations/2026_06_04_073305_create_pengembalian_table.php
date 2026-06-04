@@ -12,8 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pengembalian', function (Blueprint $table) {
-            $table->integer('id_pengembalian', true);
-            $table->integer('id_peminjaman')->nullable()->unique('id_peminjaman');
+            $table->id('id_pengembalian');
+
+            $table->foreignId('id_peminjaman')
+                ->nullable()
+                ->constrained('peminjaman', 'id_peminjaman')
+                ->onUpdate('restrict')
+                ->onDelete('restrict');
+
             $table->date('tanggal_aktual_kembali');
             $table->decimal('denda', 10)->nullable()->default(0);
         });

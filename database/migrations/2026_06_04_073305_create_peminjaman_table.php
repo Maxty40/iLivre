@@ -12,9 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('peminjaman', function (Blueprint $table) {
-            $table->integer('id_peminjaman', true);
-            $table->integer('id_user')->nullable()->index('id_user');
-            $table->integer('id_buku')->nullable()->index('id_buku');
+            $table->id('id_peminjaman');
+
+            $table->foreignId('id_user')
+                ->nullable()
+                ->references('id')->on('users')
+                ->onUpdate('restrict')
+                ->onDelete('restrict');
+
+            $table->foreignId('id_buku')
+                ->nullable()
+                ->references('id_buku')->on('buku')
+                ->onUpdate('restrict')
+                ->onDelete('restrict');
+
             $table->date('tanggal_pinjam');
             $table->date('tanggal_kembali_seharusnya');
             $table->enum('status', ['Dipinjam', 'Kembali'])->nullable()->default('Dipinjam');
