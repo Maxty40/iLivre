@@ -18,7 +18,7 @@ return new class extends Migration
                 p.tanggal_pinjam AS tanggal_pinjam,
                 p.tanggal_kembali_seharusnya AS tanggal_kembali_seharusnya 
             FROM peminjaman p 
-            JOIN users u ON p.id_user = u.id 
+            JOIN users u ON p.id_user = u.id S
             JOIN buku b ON p.id_buku = b.id_buku 
             WHERE p.status = 'Dipinjam'");
     }
