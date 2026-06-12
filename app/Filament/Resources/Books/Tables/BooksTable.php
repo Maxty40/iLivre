@@ -14,6 +14,8 @@ class BooksTable
     {
         return $table
             ->columns([
+                \Filament\Tables\Columns\ImageColumn::make('cover_image')
+                    ->circular(),
                 TextColumn::make('title')
                     ->searchable(),
                 TextColumn::make('author')

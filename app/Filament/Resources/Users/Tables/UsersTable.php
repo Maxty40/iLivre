@@ -14,6 +14,8 @@ class UsersTable
     {
         return $table
             ->columns([
+                \Filament\Tables\Columns\ImageColumn::make('photo')
+                    ->circular(),
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('email')

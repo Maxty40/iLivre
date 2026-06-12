@@ -22,6 +22,11 @@ class UserForm
                     ->required(),
                 TextInput::make('role_id')
                     ->numeric(),
+                \Filament\Forms\Components\FileUpload::make('photo')
+                    ->image()
+                    ->avatar()
+                    ->directory('user-photos')
+                    ->maxSize(2048),
             ]);
     }
 }

@@ -20,6 +20,10 @@ class BookForm
                     ->required()
                     ->numeric()
                     ->default(0),
+                \Filament\Forms\Components\FileUpload::make('cover_image')
+                    ->image()
+                    ->directory('book-covers')
+                    ->maxSize(2048),
             ]);
     }
 }
