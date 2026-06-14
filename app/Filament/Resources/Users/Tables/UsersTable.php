@@ -15,6 +15,7 @@ class UsersTable
         return $table
             ->columns([
                 \Filament\Tables\Columns\ImageColumn::make('photo')
+                    ->disk('public')
                     ->circular(),
                 TextColumn::make('name')
                     ->searchable(),
