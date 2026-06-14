@@ -21,6 +21,7 @@ class BookForm
                     ->numeric()
                     ->default(0),
                 \Filament\Forms\Components\FileUpload::make('cover_image')
+                    ->disk('public')
                     ->image()
                     ->directory('book-covers')
                     ->maxSize(2048),

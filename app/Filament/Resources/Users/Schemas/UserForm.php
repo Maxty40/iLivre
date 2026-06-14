@@ -23,6 +23,7 @@ class UserForm
                 TextInput::make('role_id')
                     ->numeric(),
                 \Filament\Forms\Components\FileUpload::make('photo')
+                    ->disk('public')
                     ->image()
                     ->avatar()
                     ->directory('user-photos')

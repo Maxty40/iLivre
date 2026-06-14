@@ -9,7 +9,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="antialiased bg-slate-50 text-slate-800 font-sans selection:bg-orange-500 selection:text-white">
+<body class="antialiased bg-slate-100 text-slate-800 font-sans selection:bg-orange-500 selection:text-white">
 
     <nav class="w-full bg-white shadow-sm fixed top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,7 +21,9 @@
                             d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
                         </path>
                     </svg>
-                    <span class="font-bold text-xl tracking-tight text-orange-900">iLivre</span>
+                    <span class="text-orange-600 font-bold text-xl tracking-tight">i<span
+                            class="text-slate-800">Livre</span>
+                    </span>
                 </div>
 
                 <div class="flex items-center gap-4">
@@ -72,7 +74,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div
-                    class="p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:shadow-lg transition duration-300">
+                    class="p-6 bg-gray-100 rounded-2xl border border-slate-200 hover:shadow-lg transition duration-300">
                     <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
                         <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -84,7 +86,7 @@
                         digital interaktif kami.</p>
                 </div>
                 <div
-                    class="p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:shadow-lg transition duration-300">
+                    class="p-6 bg-gray-100 rounded-2xl border border-slate-200 hover:shadow-lg transition duration-300">
                     <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
                         <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -96,7 +98,7 @@
                         dashboard-mu.</p>
                 </div>
                 <div
-                    class="p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:shadow-lg transition duration-300">
+                    class="p-6 bg-gray-100 rounded-2xl border border-slate-200 hover:shadow-lg transition duration-300">
                     <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
                         <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -113,8 +115,7 @@
     </section>
 
     <footer class="bg-white border-t border-slate-200 py-8 text-center">
-        <p class="text-slate-500 text-sm">© 2026 iLivre Library Management System. Didesain dengan 💙 menggunakan
-            Tailwind CSS.</p>
+        <p class="text-slate-500 text-sm">© 2026 iLivre Library Management System. By Team iLivre.</p>
     </footer>
 
 </body>
