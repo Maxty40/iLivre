@@ -14,6 +14,7 @@ Route::get('/dashboard', function () {
     $activeCount = DB::table('loans')
         ->leftJoin('returns', 'loans.id', '=', 'returns.loan_id')
         ->where('loans.user_id', Auth::id())
+        ->where('loans.status', 'approved')
         ->whereNull('returns.id')
         ->count();
 
@@ -38,9 +39,18 @@ Route::middleware('auth')->group(function () {
             ->join('books', 'loans.book_id', '=', 'books.id')
             ->leftJoin('returns', 'loans.id', '=', 'returns.loan_id')
             ->where('loans.user_id', Auth::id())
+            ->whereIn('loans.status', ['approved', 'borrowed', 'pending_return'])
             ->whereNull('returns.id')
             ->select('loans.*', 'books.title', 'books.author')
             ->orderBy('loans.due_date', 'asc')
+            ->get();
+
+        $pendingLoans = DB::table('loans')
+            ->join('books', 'loans.book_id', '=', 'books.id')
+            ->where('loans.user_id', Auth::id())
+            ->where('loans.status', 'pending') 
+            ->select('loans.*', 'books.title', 'books.author')
+            ->orderBy('loans.created_at', 'desc')
             ->get();
 
         $returnHistory = DB::table('returns')
@@ -51,7 +61,7 @@ Route::middleware('auth')->group(function () {
             ->orderBy('returns.actual_return_date', 'desc')
             ->get();
 
-        return view('loans', compact('activeLoans', 'returnHistory'));
+        return view('loans', compact('activeLoans', 'pendingLoans', 'returnHistory'));
     })->name('loans.index');
 
     // Proses peminjaman baru
@@ -67,7 +77,7 @@ Route::middleware('auth')->group(function () {
                 $request->book_id,
                 $request->quantity,
             ]);
-            return redirect()->back()->with('success', 'Buku berhasil dipinjam! Tenggat pengembalian 7 hari.');
+            return redirect()->back()->with('success', 'Permintaan peminjaman berhasil dikirim! Menunggu persetujuan petugas.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -78,11 +88,11 @@ Route::middleware('auth')->group(function () {
         $request->validate(['loan_id' => 'required|integer']);
 
         try {
-            DB::statement('CALL sp_return_loan(?, ?)', [
+            DB::statement('CALL sp_request_return(?, ?)', [
                 $request->loan_id,
                 Auth::id(),
             ]);
-            return redirect()->back()->with('success', 'Buku berhasil dikembalikan!');
+            return redirect()->back()->with('success', 'Pengajuan pengembalian berhasil dikirim! Silakan serahkan buku ke petugas.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

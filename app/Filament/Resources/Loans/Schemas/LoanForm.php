@@ -24,7 +24,13 @@ class LoanForm
                 DatePicker::make('due_date')
                     ->required(),
                 Select::make('status')
-                    ->options(['borrowed' => 'Borrowed', 'returned' => 'Returned'])
+                    ->options([
+                        'borrowed' => 'Borrowed', 
+                        'returned' => 'Returned',
+                        'pending' => 'Pending',
+                        'pending_return' => 'Pending Return',
+                        'rejected' => 'Rejected',
+                        ])
                     ->default('borrowed')
                     ->required(),
                 TextInput::make('quantity')

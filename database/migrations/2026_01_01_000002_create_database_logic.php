@@ -122,7 +122,7 @@ return new class extends Migration
                 IF v_available_stock >= p_quantity THEN
                     -- Added created_at and updated_at initialization
                     INSERT INTO loans (user_id, book_id, loan_date, due_date, quantity, created_at, updated_at)
-                    VALUES (p_user_id, p_book_id, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY), p_quantity, NOW(), NOW());
+                    VALUES (p_user_id, p_book_id, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY), p_quantity, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());
                 ELSE
                     SIGNAL SQLSTATE '45000'
                     SET MESSAGE_TEXT = 'Gagal meminjam: Stok buku tidak mencukupi';
@@ -136,7 +136,7 @@ return new class extends Migration
             BEGIN
                 -- Added created_at and updated_at initialization
                 INSERT INTO books (title, author, publisher, stock, created_at, updated_at)
-                VALUES (p_title, p_author, p_publisher, p_stock, NOW(), NOW());
+                VALUES (p_title, p_author, p_publisher, p_stock, CURDATE(), CURDATE());
             END
         ");
 

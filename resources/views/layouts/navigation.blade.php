@@ -23,6 +23,7 @@
                             $activeLoanCount = \Illuminate\Support\Facades\DB::table('loans')
                                 ->leftJoin('returns', 'loans.id', '=', 'returns.loan_id')
                                 ->where('loans.user_id', Auth::id())
+                                ->whereIn('loans.status', ['approved', 'borrowed', 'pending_return'])
                                 ->whereNull('returns.id')
                                 ->count();
                         @endphp

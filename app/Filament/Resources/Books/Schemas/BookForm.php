@@ -17,6 +17,7 @@ class BookForm
                     ->required(),
                 TextInput::make('publisher'),
                 TextInput::make('stock')
+                    ->label('Total Stock')
                     ->required()
                     ->numeric()
                     ->default(0),
