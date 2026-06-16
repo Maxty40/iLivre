@@ -16,14 +16,19 @@ class BooksTable
             ->columns([
                 \Filament\Tables\Columns\ImageColumn::make('cover_image')
                     ->disk('public')
+                    ->label('Sampul Buku')
                     ->circular(),
                 TextColumn::make('title')
+                    ->label('Judul')
                     ->searchable(),
                 TextColumn::make('author')
+                    ->label('Penulis')
                     ->searchable(),
                 TextColumn::make('publisher')
+                    ->label('Penerbit')
                     ->searchable(),
                 TextColumn::make('stock')
+                    ->label('Stok')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')

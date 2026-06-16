@@ -16,13 +16,16 @@ class UsersTable
             ->columns([
                 \Filament\Tables\Columns\ImageColumn::make('photo')
                     ->disk('public')
+                    ->label('Foto Profil')
                     ->circular(),
                 TextColumn::make('name')
+                    ->label('Nama')
                     ->searchable(),
                 TextColumn::make('email')
-                    ->label('Email address')
+                    ->label('Alamat Email')
                     ->searchable(),
                 TextColumn::make('role_id')
+                    ->label('Role')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')

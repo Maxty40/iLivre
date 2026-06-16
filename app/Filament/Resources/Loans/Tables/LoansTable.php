@@ -14,21 +14,26 @@ class LoansTable
     {
         return $table
             ->columns([
-                TextColumn::make('user_id')
+                TextColumn::make('user.name')
+                    ->label('Username')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('book_id')
+                TextColumn::make('book.title')
+                    ->label('Judul Buku')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('loan_date')
+                    ->label('Tanggal Pinjam')
                     ->date()
                     ->sortable(),
                 TextColumn::make('due_date')
+                    ->label('Tanggal Kembali')
                     ->date()
                     ->sortable(),
                 TextColumn::make('status')
                     ->badge(),
                 TextColumn::make('quantity')
+                    ->label('Jumlah')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
