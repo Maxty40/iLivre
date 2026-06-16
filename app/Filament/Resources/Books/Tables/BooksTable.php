@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Books\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -14,7 +15,7 @@ class BooksTable
     {
         return $table
             ->columns([
-                \Filament\Tables\Columns\ImageColumn::make('cover_image')
+                ImageColumn::make('cover_image')
                     ->disk('public')
                     ->label('Sampul Buku')
                     ->circular(),
@@ -44,8 +45,9 @@ class BooksTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
-            ])
+                EditAction::make()
+                ->visible(fn () => auth()->user()->hasRole('Admin')),
+                ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

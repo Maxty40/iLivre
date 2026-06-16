@@ -24,7 +24,7 @@ class UsersTable
                 TextColumn::make('email')
                     ->label('Alamat Email')
                     ->searchable(),
-                TextColumn::make('role_id')
+                TextColumn::make('roles.name')
                     ->label('Role')
                     ->numeric()
                     ->sortable(),

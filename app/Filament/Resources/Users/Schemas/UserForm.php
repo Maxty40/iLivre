@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
 
 class UserForm
 {
@@ -20,8 +21,11 @@ class UserForm
                 TextInput::make('password')
                     ->password()
                     ->required(),
-                TextInput::make('role_id')
-                    ->numeric(),
+                Select::make('roles')
+                    ->multiple()
+                    ->relationship('roles', 'name')
+                    ->preload()
+                    ->label('Role'),
                 \Filament\Forms\Components\FileUpload::make('photo')
                     ->disk('public')
                     ->image()

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Loans;
 
+use Illuminate\Database\Eloquent\Model;
 use App\Filament\Resources\Loans\Pages\CreateLoan;
 use App\Filament\Resources\Loans\Pages\EditLoan;
 use App\Filament\Resources\Loans\Pages\ListLoans;
@@ -44,5 +45,25 @@ class LoanResource extends Resource
             'create' => CreateLoan::route('/create'),
             'edit' => EditLoan::route('/{record}/edit'),
         ];
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->hasRole('Admin') || auth()->user()->hasPermissionTo('view-loans');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()->hasRole('Admin') || auth()->user()->hasPermissionTo('process-loan');
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()->hasRole('Admin') || auth()->user()->hasPermissionTo('edit-loans');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()->hasRole('Admin') || auth()->user()->hasPermissionTo('delete-loans');
     }
 }

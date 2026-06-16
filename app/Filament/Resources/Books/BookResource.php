@@ -45,4 +45,24 @@ class BookResource extends Resource
             'edit' => EditBook::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->hasRole('Admin') || auth()->user()->hasPermissionTo('view-books');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()->hasRole('Admin') || auth()->user()->hasPermissionTo('create-book');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()->hasRole('Admin') || auth()->user()->hasPermissionTo('edit-book');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()->hasRole('Admin') || auth()->user()->hasPermissionTo('delete-book');
+    }
 }
