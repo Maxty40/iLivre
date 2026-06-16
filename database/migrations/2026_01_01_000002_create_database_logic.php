@@ -10,7 +10,7 @@ return new class extends Migration
         DB::unprepared("
             DROP VIEW IF EXISTS v_book_catalog;
             CREATE VIEW v_book_catalog AS
-            SELECT 
+            SELECT
                 b.id AS book_id,
                 b.title,
                 b.author,
@@ -29,7 +29,7 @@ return new class extends Migration
         DB::unprepared("
             DROP VIEW IF EXISTS v_active_loans;
             CREATE VIEW v_active_loans AS
-            SELECT 
+            SELECT
                 l.id AS loan_id,
                 u.name AS user_name,
                 b.title AS book_title,
@@ -46,7 +46,7 @@ return new class extends Migration
         DB::unprepared("
             DROP VIEW IF EXISTS v_overdue_loans;
             CREATE VIEW v_overdue_loans AS
-            SELECT 
+            SELECT
                 l.id AS loan_id,
                 u.name AS user_name,
                 b.title AS book_title,
@@ -82,7 +82,7 @@ return new class extends Migration
                 FROM loans l
                 LEFT JOIN returns r ON l.id = r.loan_id
                 WHERE l.user_id = NEW.user_id AND r.id IS NULL AND l.due_date < CURDATE();
-                
+
                 IF overdue_count > 0 THEN
                     SIGNAL SQLSTATE '45000'
                     SET MESSAGE_TEXT = 'Tidak dapat meminjam buku. Ada buku yang terlambat dikembalikan.';
@@ -106,7 +106,7 @@ return new class extends Migration
             CREATE PROCEDURE sp_create_loan(IN p_user_id INT, IN p_book_id INT, IN p_quantity INT)
             BEGIN
                 DECLARE v_available_stock INT;
-                
+
                 IF p_quantity < 1 THEN
                     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Kuantitas peminjaman minimal 1';
                 END IF;
@@ -114,14 +114,15 @@ return new class extends Migration
                 IF p_quantity > 3 THEN
                     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Maksimal meminjam 3 buku dalam satu transaksi';
                 END IF;
-                
-                SELECT available_stock INTO v_available_stock 
-                FROM v_book_catalog 
+
+                SELECT available_stock INTO v_available_stock
+                FROM v_book_catalog
                 WHERE book_id = p_book_id;
-                
+
                 IF v_available_stock >= p_quantity THEN
-                    INSERT INTO loans (user_id, book_id, loan_date, due_date, quantity)
-                    VALUES (p_user_id, p_book_id, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY), p_quantity);
+                    -- Added created_at and updated_at initialization
+                    INSERT INTO loans (user_id, book_id, loan_date, due_date, quantity, created_at, updated_at)
+                    VALUES (p_user_id, p_book_id, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY), p_quantity, NOW(), NOW());
                 ELSE
                     SIGNAL SQLSTATE '45000'
                     SET MESSAGE_TEXT = 'Gagal meminjam: Stok buku tidak mencukupi';
@@ -133,8 +134,9 @@ return new class extends Migration
             DROP PROCEDURE IF EXISTS sp_add_new_book;
             CREATE PROCEDURE sp_add_new_book(IN p_title VARCHAR(255), IN p_author VARCHAR(255), IN p_publisher VARCHAR(255), IN p_stock INT)
             BEGIN
-                INSERT INTO books (title, author, publisher, stock)
-                VALUES (p_title, p_author, p_publisher, p_stock);
+                -- Added created_at and updated_at initialization
+                INSERT INTO books (title, author, publisher, stock, created_at, updated_at)
+                VALUES (p_title, p_author, p_publisher, p_stock, NOW(), NOW());
             END
         ");
 
@@ -143,7 +145,7 @@ return new class extends Migration
             CREATE PROCEDURE sp_add_book_stock(IN p_book_id INT, IN p_additional_stock INT)
             BEGIN
                 UPDATE books
-                SET stock = stock + p_additional_stock
+                SET stock = stock + p_additional_stock, updated_at = NOW()
                 WHERE id = p_book_id;
             END
         ");
@@ -157,7 +159,7 @@ return new class extends Migration
                 FROM loans l
                 LEFT JOIN returns r ON l.id = r.loan_id
                 WHERE l.book_id = p_book_id AND r.id IS NULL;
-                
+
                 IF active_loans > 0 THEN
                     SIGNAL SQLSTATE '45000'
                     SET MESSAGE_TEXT = 'Tidak dapat menghapus buku yang sedang dipinjam';
