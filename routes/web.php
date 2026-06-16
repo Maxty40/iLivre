@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 Route::get('/dashboard', function () {
     $activeCount = DB::table('loans')

@@ -4,7 +4,7 @@
             <div class="flex">
                 {{-- Logo --}}
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
+                    <a href="{{ route('home') }}" class="flex items-center gap-2">
                         <span class="text-orange-600 font-extrabold text-xl tracking-tight">i<span class="text-slate-800">Livre</span></span>
                     </a>
                 </div>
