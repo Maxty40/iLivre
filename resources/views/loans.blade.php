@@ -264,25 +264,37 @@
                             <thead>
                                 <tr class="bg-slate-50">
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Buku</th>
+                                        class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider w-16">
+                                        No
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Jml</th>
+                                        Buku
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Tgl Pinjam</th>
+                                        Jml
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Tgl Kembali</th>
+                                        Tgl Pinjam
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Denda</th>
+                                        Tgl Kembali
+                                    </th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                        Denda
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-slate-100">
                                 @foreach ($returnHistory as $item)
                                     <tr class="hover:bg-slate-50 transition">
+                                        <td class="px-6 py-4 text-sm font-medium text-slate-400">
+                                            {{ $returnHistory->firstItem() + $loop->index }}
+                                        </td>
                                         <td class="px-6 py-4">
                                             <div class="font-semibold text-slate-800 text-sm">{{ $item->title }}
                                             </div>
@@ -297,16 +309,25 @@
                                         </td>
                                         <td class="px-6 py-4 text-sm">
                                             @if ($item->fine > 0)
-                                                <span class="font-semibold text-red-600">Rp
-                                                    {{ number_format($item->fine, 0, ',', '.') }}</span>
+                                                <span
+                                                    class="font-semibold text-red-600 bg-red-50 border border-red-100 px-2.5 py-1 rounded-full text-xs inline-block">
+                                                    Rp {{ number_format($item->fine, 0, ',', '.') }}
+                                                </span>
                                             @else
-                                                <span class="text-green-600 font-semibold">Tidak ada</span>
+                                                <span
+                                                    class="text-green-600 bg-green-50 border border-green-100 px-2.5 py-1 rounded-full text-xs inline-block font-semibold">
+                                                    Tidak ada
+                                                </span>
                                             @endif
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+
+                    <div class="px-6 py-4 bg-slate-50/70 border-t border-slate-100 table-pagination-container">
+                        {{ $returnHistory->links() }}
                     </div>
                 @else
                     <div class="px-6 py-12 text-center text-slate-400">

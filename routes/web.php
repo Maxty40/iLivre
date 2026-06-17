@@ -48,18 +48,19 @@ Route::middleware('auth')->group(function () {
         $pendingLoans = DB::table('loans')
             ->join('books', 'loans.book_id', '=', 'books.id')
             ->where('loans.user_id', Auth::id())
-            ->where('loans.status', 'pending') 
+            ->where('loans.status', 'pending')
             ->select('loans.*', 'books.title', 'books.author')
             ->orderBy('loans.created_at', 'desc')
             ->get();
 
+        // Paginate return history to optimize performance and memory footprint
         $returnHistory = DB::table('returns')
             ->join('loans', 'returns.loan_id', '=', 'loans.id')
             ->join('books', 'loans.book_id', '=', 'books.id')
             ->where('loans.user_id', Auth::id())
             ->select('returns.*', 'loans.loan_date', 'loans.quantity', 'books.title', 'books.author')
             ->orderBy('returns.actual_return_date', 'desc')
-            ->get();
+            ->paginate(5); // Changed from get() to enable pagination semantics
 
         return view('loans', compact('activeLoans', 'pendingLoans', 'returnHistory'));
     })->name('loans.index');
