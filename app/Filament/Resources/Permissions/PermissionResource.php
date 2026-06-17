@@ -6,21 +6,25 @@ use App\Filament\Resources\Permissions\Pages\CreatePermission;
 use App\Filament\Resources\Permissions\Pages\EditPermission;
 use App\Filament\Resources\Permissions\Pages\ListPermissions;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 use Spatie\Permission\Models\Permission;
 
 class PermissionResource extends Resource
 {
     protected static ?string $model = Permission::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShieldCheck;
 
-    protected static ?string $recordTitleAttribute = 'Permission';
+    public static function getNavigationGroup(): ?string
+    {
+        return 'User Management';
+    }
+
 
     public static function form(Schema $schema): Schema
     {
@@ -33,8 +37,8 @@ class PermissionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table->columns([
-            TextColumn::make('name')->searchable(),
-            TextColumn::make('guard_name'),
+            TextColumn::make('name')->searchable()->label('Nama Izin'),
+            TextColumn::make('guard_name')->label('Guard Name'),
         ]);
     }
 

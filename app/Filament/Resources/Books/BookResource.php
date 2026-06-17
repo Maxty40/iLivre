@@ -18,7 +18,12 @@ class BookResource extends Resource
 {
     protected static ?string $model = Book::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBookOpen;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Library Management';
+    }
 
     public static function form(Schema $schema): Schema
     {

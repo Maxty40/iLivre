@@ -14,6 +14,7 @@ class ListBooks extends ListRecords
     {
         return [
             CreateAction::make()
+            ->label('Tambah Buku')
             ->visible(fn () => auth()->user()->hasRole('Admin')),
         ];
     }

@@ -12,7 +12,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Spatie\Permission\Models\Role;
 
@@ -20,9 +19,13 @@ class RoleResource extends Resource
 {
     protected static ?string $model = Role::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShieldCheck;
 
-    protected static ?string $recordTitleAttribute = 'Role';
+    public static function getNavigationGroup(): ?string
+    {
+        return 'User Management';
+    }
+
 
     public static function form(Schema $schema): Schema
     {
@@ -57,7 +60,7 @@ class RoleResource extends Resource
             'edit' => EditRole::route('/{record}/edit'),
         ];
     }
-    
+
     public static function canViewAny(): bool
     {
         return auth()->user()->hasRole('Admin');

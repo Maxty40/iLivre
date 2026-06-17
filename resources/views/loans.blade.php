@@ -19,7 +19,7 @@
                 </div>
             @endif
 
-            {{-- MENUNGGU PERSETUJUAN ADMIN --}}
+            {{-- MENUNGGU PERSETUJUAN PETUGAS --}}
             @if ($pendingLoans->count() > 0)
                 <div class="bg-white shadow-sm sm:rounded-xl overflow-hidden mb-8 border border-amber-100">
                     <div class="px-6 py-5 bg-amber-50/50 border-b border-slate-100 flex items-center gap-3">
@@ -29,7 +29,7 @@
                                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </span>
-                        <h3 class="text-lg font-bold text-slate-800">Menunggu Persetujuan Admin</h3>
+                        <h3 class="text-lg font-bold text-slate-800">Menunggu Persetujuan Petugas</h3>
                         <span class="ml-auto text-sm font-semibold bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
                             {{ $pendingLoans->count() }} Buku
                         </span>
@@ -47,7 +47,7 @@
                                         Jml</th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Tanggal Request</th>
+                                        Tanggal Pengajuan</th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         Status</th>

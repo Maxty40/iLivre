@@ -21,7 +21,12 @@ class LoanResource extends Resource
 {
     protected static ?string $model = Loan::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
+
+     public static function getNavigationGroup(): ?string
+    {
+        return 'Library Management';
+    }
 
     public static function form(Schema $schema): Schema
     {

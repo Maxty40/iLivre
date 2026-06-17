@@ -14,7 +14,7 @@ Route::get('/dashboard', function () {
     $activeCount = DB::table('loans')
         ->leftJoin('returns', 'loans.id', '=', 'returns.loan_id')
         ->where('loans.user_id', Auth::id())
-        ->where('loans.status', 'approved')
+        ->whereIn('loans.status', ['approved', 'borrowed', 'pending_return'])
         ->whereNull('returns.id')
         ->count();
 
