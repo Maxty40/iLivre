@@ -25,8 +25,8 @@ iLivre is a modern Library Management Information System (LIMS) designed to stre
 
 ## 🛠️ Tech Stack
 
-- **Framework:** Laravel 12
-- **Admin Panel:** Filament PHP
+- **Framework:** Laravel 13
+- **Admin Panel:** Filament 5
 - **Frontend:** Tailwind CSS & Laravel Blade (Breeze)
 - **Database:** MySQL
 - **Version Control:** Git & GitHub
