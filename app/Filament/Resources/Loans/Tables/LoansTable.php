@@ -21,20 +21,25 @@ class LoansTable
                 TextColumn::make('user.name')
                     ->label('Username')
                     ->numeric()
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('book.title')
                     ->label('Judul Buku')
                     ->numeric()
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('loan_date')
                     ->label('Tanggal Pinjam')
                     ->date()
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('due_date')
                     ->label('Tanggal Kembali')
                     ->date()
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('status')
+                    ->searchable()
                     ->badge()
                     ->color(fn (string $state) => match ($state) {
                         'pending' => 'warning',
@@ -48,6 +53,7 @@ class LoansTable
                 TextColumn::make('quantity')
                     ->label('Jumlah')
                     ->numeric()
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
