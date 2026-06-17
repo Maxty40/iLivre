@@ -1,5 +1,13 @@
 # 📚 iLivre (Modern Library Management System)
 
+### ⌨️ Developed By:
+1. Dhiauddin Arfa
+2. Ulwan Luthfi
+3. Klaudia Weda
+4. Ahmad Afifi
+5. Freeze Ad Kaban
+</br>
+
 > “Livre” comes from French and means “book.” Empowering readers through seamless library management.
 
 iLivre is a modern Library Management Information System (LIMS) designed to streamline book circulation, member management, and library administration. Built on the Laravel framework with an elegant interface, iLivre separates the Admin and User workspaces for a more focused experience.
