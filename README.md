@@ -30,3 +30,39 @@ iLivre is a modern Library Management Information System (LIMS) designed to stre
 - **Frontend:** Tailwind CSS & Laravel Blade (Breeze)
 - **Database:** MySQL
 - **Version Control:** Git & GitHub
+
+## ⚙️ How to Setup the Project
+1. **Clone the project**
+```bash
+git clone https://github.com/Maxty40/iLivre.git
+```
+2. **Install the composer (Installing the Laravel & Spatie)**
+```bash
+composer install
+```
+3. **Install NPM (For TailwindCSS)**
+```bash
+npm install
+```
+4. **Copy Environment**
+```bash
+cp .env.example .env
+```
+5. **Generate Key**
+```bash
+php artisan generate:key
+```
+6. **Config the database on ```.env```, then run:**
+```bash
+php artisan migrate --seed
+```
+7. **Generate Symlink**
+```bash
+php artisan storage:link
+```
+8. **Finally, run the project**
+```bash
+php artisan serve
+npm run dev
+```
+9. **Enjoy!**
