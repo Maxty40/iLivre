@@ -25,18 +25,18 @@ DELIMITER $$
 --
 -- Procedures
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_add_book_stock` (IN `p_book_id` INT, IN `p_additional_stock` INT)   BEGIN
+CREATE PROCEDURE `sp_add_book_stock` (IN `p_book_id` INT, IN `p_additional_stock` INT)   BEGIN
                 UPDATE books
                 SET stock = stock + p_additional_stock
                 WHERE id = p_book_id;
             END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_add_new_book` (IN `p_title` VARCHAR(255), IN `p_author` VARCHAR(255), IN `p_publisher` VARCHAR(255), IN `p_stock` INT)   BEGIN
+CREATE PROCEDURE `sp_add_new_book` (IN `p_title` VARCHAR(255), IN `p_author` VARCHAR(255), IN `p_publisher` VARCHAR(255), IN `p_stock` INT)   BEGIN
                 INSERT INTO books (title, author, publisher, stock)
                 VALUES (p_title, p_author, p_publisher, p_stock);
             END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_approval_loan` (IN `p_loan_id` BIGINT)   BEGIN
+CREATE PROCEDURE `sp_approval_loan` (IN `p_loan_id` BIGINT)   BEGIN
     DECLARE v_book_id BIGINT;
 
     -- 1. Ambil book_id dari peminjaman yang mau di-approve
@@ -49,7 +49,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_approval_loan` (IN `p_loan_id` B
     UPDATE books SET stock = stock - 1 WHERE id = v_book_id;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_approve_loan` (IN `p_loan_id` INT)   BEGIN
+CREATE PROCEDURE `sp_approve_loan` (IN `p_loan_id` INT)   BEGIN
                 DECLARE v_book_id INT;
                 DECLARE v_qty INT;
                 DECLARE v_available_stock INT;
@@ -74,7 +74,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_approve_loan` (IN `p_loan_id` IN
                 END IF;
             END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_create_loan` (IN `p_user_id` INT, IN `p_book_id` INT, IN `p_quantity` INT)   BEGIN
+CREATE PROCEDURE `sp_create_loan` (IN `p_user_id` INT, IN `p_book_id` INT, IN `p_quantity` INT)   BEGIN
                 DECLARE v_available_stock INT;
                 
                 IF p_quantity < 1 THEN
@@ -98,7 +98,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_create_loan` (IN `p_user_id` INT
                 END IF;
             END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_book` (IN `p_book_id` INT)   BEGIN
+CREATE PROCEDURE `sp_delete_book` (IN `p_book_id` INT)   BEGIN
                 DECLARE active_loans INT;
                 SELECT COUNT(l.id) INTO active_loans
                 FROM loans l
@@ -113,20 +113,20 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_book` (IN `p_book_id` INT
                 END IF;
             END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_user_total_fines` (IN `p_user_id` INT, OUT `p_total_fine` DECIMAL(10,2))   BEGIN
+CREATE PROCEDURE `sp_get_user_total_fines` (IN `p_user_id` INT, OUT `p_total_fine` DECIMAL(10,2))   BEGIN
                 SELECT COALESCE(SUM(fine), 0) INTO p_total_fine
                 FROM returns r
                 JOIN loans l ON r.loan_id = l.id
                 WHERE l.user_id = p_user_id;
             END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_reject_loan` (IN `p_loan_id` INT)   BEGIN
+CREATE PROCEDURE `sp_reject_loan` (IN `p_loan_id` INT)   BEGIN
                 UPDATE loans 
                 SET status = 'rejected', updated_at = CURRENT_TIMESTAMP() 
                 WHERE id = p_loan_id;
             END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_request_return` (IN `p_loan_id` INT, IN `p_user_id` INT)   BEGIN
+CREATE PROCEDURE `sp_request_return` (IN `p_loan_id` INT, IN `p_user_id` INT)   BEGIN
                 -- Pastikan data peminjaman cocok dan statusnya memang sedang dipinjam
                 IF (SELECT COUNT(*) FROM loans WHERE id = p_loan_id AND user_id = p_user_id AND status IN ('approved', 'borrowed')) = 0 THEN
                     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Peminjaman tidak valid atau sudah diproses sebelumnya';
@@ -136,7 +136,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_request_return` (IN `p_loan_id` 
                 UPDATE loans SET status = 'pending_return', updated_at = NOW() WHERE id = p_loan_id;
             END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_return_loan` (IN `p_loan_id` INT, IN `p_user_id` INT)   BEGIN DECLARE v_loan_count INT; DECLARE v_due_date DATE; DECLARE v_days_late INT; DECLARE v_fine DECIMAL(10,2); SELECT COUNT(*) INTO v_loan_count FROM loans WHERE id = p_loan_id AND user_id = p_user_id; IF v_loan_count = 0 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Peminjaman tidak ditemukan atau bukan milik Anda'; END IF; SELECT due_date INTO v_due_date FROM loans WHERE id = p_loan_id; SET v_days_late = GREATEST(0, DATEDIFF(CURDATE(), v_due_date)); SET v_fine = v_days_late * 5000; INSERT INTO returns (loan_id, actual_return_date, fine, created_at, updated_at) VALUES (p_loan_id, CURDATE(), v_fine, NOW(), NOW()); END$$
+CREATE PROCEDURE `sp_return_loan` (IN `p_loan_id` INT, IN `p_user_id` INT)   BEGIN DECLARE v_loan_count INT; DECLARE v_due_date DATE; DECLARE v_days_late INT; DECLARE v_fine DECIMAL(10,2); SELECT COUNT(*) INTO v_loan_count FROM loans WHERE id = p_loan_id AND user_id = p_user_id; IF v_loan_count = 0 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Peminjaman tidak ditemukan atau bukan milik Anda'; END IF; SELECT due_date INTO v_due_date FROM loans WHERE id = p_loan_id; SET v_days_late = GREATEST(0, DATEDIFF(CURDATE(), v_due_date)); SET v_fine = v_days_late * 5000; INSERT INTO returns (loan_id, actual_return_date, fine, created_at, updated_at) VALUES (p_loan_id, CURDATE(), v_fine, NOW(), NOW()); END$$
 
 DELIMITER ;
 
@@ -725,7 +725,7 @@ ALTER TABLE `users`
 --
 DROP TABLE IF EXISTS `v_active_loans`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_active_loans`  AS SELECT `l`.`id` AS `loan_id`, `u`.`name` AS `user_name`, `b`.`title` AS `book_title`, `l`.`loan_date` AS `loan_date`, `l`.`due_date` AS `due_date`, `l`.`quantity` AS `quantity` FROM (((`loans` `l` join `users` `u` on((`l`.`user_id` = `u`.`id`))) join `books` `b` on((`l`.`book_id` = `b`.`id`))) left join `returns` `r` on((`l`.`id` = `r`.`loan_id`))) WHERE (`r`.`id` is null) ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_active_loans`  AS SELECT `l`.`id` AS `loan_id`, `u`.`name` AS `user_name`, `b`.`title` AS `book_title`, `l`.`loan_date` AS `loan_date`, `l`.`due_date` AS `due_date`, `l`.`quantity` AS `quantity` FROM (((`loans` `l` join `users` `u` on((`l`.`user_id` = `u`.`id`))) join `books` `b` on((`l`.`book_id` = `b`.`id`))) left join `returns` `r` on((`l`.`id` = `r`.`loan_id`))) WHERE (`r`.`id` is null) ;
 
 -- --------------------------------------------------------
 
@@ -734,7 +734,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `v_book_catalog`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_book_catalog`  AS SELECT `b`.`id` AS `book_id`, `b`.`title` AS `title`, `b`.`author` AS `author`, `b`.`publisher` AS `publisher`, `b`.`cover_image` AS `cover_image`, `b`.`stock` AS `total_stock`, (`b`.`stock` - coalesce((select sum(`l`.`quantity`) from `loans` `l` where ((`l`.`book_id` = `b`.`id`) and (`l`.`status` in ('approved','borrowed','pending_return')))),0)) AS `available_stock` FROM `books` AS `b` ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_book_catalog`  AS SELECT `b`.`id` AS `book_id`, `b`.`title` AS `title`, `b`.`author` AS `author`, `b`.`publisher` AS `publisher`, `b`.`cover_image` AS `cover_image`, `b`.`stock` AS `total_stock`, (`b`.`stock` - coalesce((select sum(`l`.`quantity`) from `loans` `l` where ((`l`.`book_id` = `b`.`id`) and (`l`.`status` in ('approved','borrowed','pending_return')))),0)) AS `available_stock` FROM `books` AS `b` ;
 
 -- --------------------------------------------------------
 
@@ -743,7 +743,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `v_overdue_loans`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_overdue_loans`  AS SELECT `l`.`id` AS `loan_id`, `u`.`name` AS `user_name`, `b`.`title` AS `book_title`, `l`.`due_date` AS `due_date`, (to_days(curdate()) - to_days(`l`.`due_date`)) AS `days_overdue`, ((to_days(curdate()) - to_days(`l`.`due_date`)) * 5000) AS `estimated_fine` FROM (((`loans` `l` join `users` `u` on((`l`.`user_id` = `u`.`id`))) join `books` `b` on((`l`.`book_id` = `b`.`id`))) left join `returns` `r` on((`l`.`id` = `r`.`loan_id`))) WHERE ((`r`.`id` is null) AND (`l`.`due_date` < curdate())) ;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_overdue_loans`  AS SELECT `l`.`id` AS `loan_id`, `u`.`name` AS `user_name`, `b`.`title` AS `book_title`, `l`.`due_date` AS `due_date`, (to_days(curdate()) - to_days(`l`.`due_date`)) AS `days_overdue`, ((to_days(curdate()) - to_days(`l`.`due_date`)) * 5000) AS `estimated_fine` FROM (((`loans` `l` join `users` `u` on((`l`.`user_id` = `u`.`id`))) join `books` `b` on((`l`.`book_id` = `b`.`id`))) left join `returns` `r` on((`l`.`id` = `r`.`loan_id`))) WHERE ((`r`.`id` is null) AND (`l`.`due_date` < curdate())) ;
 
 --
 -- Constraints for dumped tables
