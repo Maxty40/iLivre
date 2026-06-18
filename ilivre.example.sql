@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 18, 2026 at 06:40 AM
+-- Generation Time: Jun 18, 2026 at 07:35 AM
 -- Server version: 8.4.3
 -- PHP Version: 8.4.12
 
@@ -25,21 +25,18 @@ DELIMITER $$
 --
 -- Procedures
 --
-DROP PROCEDURE IF EXISTS `sp_add_book_stock`$$
-CREATE PROCEDURE `sp_add_book_stock` (IN `p_book_id` INT, IN `p_additional_stock` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_add_book_stock` (IN `p_book_id` INT, IN `p_additional_stock` INT)   BEGIN
                 UPDATE books
                 SET stock = stock + p_additional_stock
                 WHERE id = p_book_id;
             END$$
 
-DROP PROCEDURE IF EXISTS `sp_add_new_book`$$
-CREATE PROCEDURE `sp_add_new_book` (IN `p_title` VARCHAR(255), IN `p_author` VARCHAR(255), IN `p_publisher` VARCHAR(255), IN `p_stock` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_add_new_book` (IN `p_title` VARCHAR(255), IN `p_author` VARCHAR(255), IN `p_publisher` VARCHAR(255), IN `p_stock` INT)   BEGIN
                 INSERT INTO books (title, author, publisher, stock)
                 VALUES (p_title, p_author, p_publisher, p_stock);
             END$$
 
-DROP PROCEDURE IF EXISTS `sp_approval_loan`$$
-CREATE PROCEDURE `sp_approval_loan` (IN `p_loan_id` BIGINT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_approval_loan` (IN `p_loan_id` BIGINT)   BEGIN
     DECLARE v_book_id BIGINT;
 
     -- 1. Ambil book_id dari peminjaman yang mau di-approve
@@ -52,8 +49,7 @@ CREATE PROCEDURE `sp_approval_loan` (IN `p_loan_id` BIGINT)   BEGIN
     UPDATE books SET stock = stock - 1 WHERE id = v_book_id;
 END$$
 
-DROP PROCEDURE IF EXISTS `sp_approve_loan`$$
-CREATE PROCEDURE `sp_approve_loan` (IN `p_loan_id` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_approve_loan` (IN `p_loan_id` INT)   BEGIN
                 DECLARE v_book_id INT;
                 DECLARE v_qty INT;
                 DECLARE v_available_stock INT;
@@ -78,8 +74,7 @@ CREATE PROCEDURE `sp_approve_loan` (IN `p_loan_id` INT)   BEGIN
                 END IF;
             END$$
 
-DROP PROCEDURE IF EXISTS `sp_create_loan`$$
-CREATE PROCEDURE `sp_create_loan` (IN `p_user_id` INT, IN `p_book_id` INT, IN `p_quantity` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_create_loan` (IN `p_user_id` INT, IN `p_book_id` INT, IN `p_quantity` INT)   BEGIN
                 DECLARE v_available_stock INT;
                 
                 IF p_quantity < 1 THEN
@@ -103,8 +98,7 @@ CREATE PROCEDURE `sp_create_loan` (IN `p_user_id` INT, IN `p_book_id` INT, IN `p
                 END IF;
             END$$
 
-DROP PROCEDURE IF EXISTS `sp_delete_book`$$
-CREATE PROCEDURE `sp_delete_book` (IN `p_book_id` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_book` (IN `p_book_id` INT)   BEGIN
                 DECLARE active_loans INT;
                 SELECT COUNT(l.id) INTO active_loans
                 FROM loans l
@@ -119,23 +113,20 @@ CREATE PROCEDURE `sp_delete_book` (IN `p_book_id` INT)   BEGIN
                 END IF;
             END$$
 
-DROP PROCEDURE IF EXISTS `sp_get_user_total_fines`$$
-CREATE PROCEDURE `sp_get_user_total_fines` (IN `p_user_id` INT, OUT `p_total_fine` DECIMAL(10,2))   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_user_total_fines` (IN `p_user_id` INT, OUT `p_total_fine` DECIMAL(10,2))   BEGIN
                 SELECT COALESCE(SUM(fine), 0) INTO p_total_fine
                 FROM returns r
                 JOIN loans l ON r.loan_id = l.id
                 WHERE l.user_id = p_user_id;
             END$$
 
-DROP PROCEDURE IF EXISTS `sp_reject_loan`$$
-CREATE PROCEDURE `sp_reject_loan` (IN `p_loan_id` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_reject_loan` (IN `p_loan_id` INT)   BEGIN
                 UPDATE loans 
                 SET status = 'rejected', updated_at = CURRENT_TIMESTAMP() 
                 WHERE id = p_loan_id;
             END$$
 
-DROP PROCEDURE IF EXISTS `sp_request_return`$$
-CREATE PROCEDURE `sp_request_return` (IN `p_loan_id` INT, IN `p_user_id` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_request_return` (IN `p_loan_id` INT, IN `p_user_id` INT)   BEGIN
                 -- Pastikan data peminjaman cocok dan statusnya memang sedang dipinjam
                 IF (SELECT COUNT(*) FROM loans WHERE id = p_loan_id AND user_id = p_user_id AND status IN ('approved', 'borrowed')) = 0 THEN
                     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Peminjaman tidak valid atau sudah diproses sebelumnya';
@@ -145,8 +136,7 @@ CREATE PROCEDURE `sp_request_return` (IN `p_loan_id` INT, IN `p_user_id` INT)   
                 UPDATE loans SET status = 'pending_return', updated_at = NOW() WHERE id = p_loan_id;
             END$$
 
-DROP PROCEDURE IF EXISTS `sp_return_loan`$$
-CREATE PROCEDURE `sp_return_loan` (IN `p_loan_id` INT, IN `p_user_id` INT)   BEGIN DECLARE v_loan_count INT; DECLARE v_due_date DATE; DECLARE v_days_late INT; DECLARE v_fine DECIMAL(10,2); SELECT COUNT(*) INTO v_loan_count FROM loans WHERE id = p_loan_id AND user_id = p_user_id; IF v_loan_count = 0 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Peminjaman tidak ditemukan atau bukan milik Anda'; END IF; SELECT due_date INTO v_due_date FROM loans WHERE id = p_loan_id; SET v_days_late = GREATEST(0, DATEDIFF(CURDATE(), v_due_date)); SET v_fine = v_days_late * 5000; INSERT INTO returns (loan_id, actual_return_date, fine, created_at, updated_at) VALUES (p_loan_id, CURDATE(), v_fine, NOW(), NOW()); END$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_return_loan` (IN `p_loan_id` INT, IN `p_user_id` INT)   BEGIN DECLARE v_loan_count INT; DECLARE v_due_date DATE; DECLARE v_days_late INT; DECLARE v_fine DECIMAL(10,2); SELECT COUNT(*) INTO v_loan_count FROM loans WHERE id = p_loan_id AND user_id = p_user_id; IF v_loan_count = 0 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Peminjaman tidak ditemukan atau bukan milik Anda'; END IF; SELECT due_date INTO v_due_date FROM loans WHERE id = p_loan_id; SET v_days_late = GREATEST(0, DATEDIFF(CURDATE(), v_due_date)); SET v_fine = v_days_late * 5000; INSERT INTO returns (loan_id, actual_return_date, fine, created_at, updated_at) VALUES (p_loan_id, CURDATE(), v_fine, NOW(), NOW()); END$$
 
 DELIMITER ;
 
@@ -156,17 +146,15 @@ DELIMITER ;
 -- Table structure for table `books`
 --
 
-DROP TABLE IF EXISTS `books`;
 CREATE TABLE `books` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` bigint UNSIGNED NOT NULL,
   `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `author` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `publisher` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `stock` int NOT NULL DEFAULT '0',
   `cover_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -185,7 +173,6 @@ INSERT INTO `books` (`id`, `title`, `author`, `publisher`, `stock`, `cover_image
 --
 -- Triggers `books`
 --
-DROP TRIGGER IF EXISTS `trg_before_update_book`;
 DELIMITER $$
 CREATE TRIGGER `trg_before_update_book` BEFORE UPDATE ON `books` FOR EACH ROW BEGIN
                 IF NEW.stock < 0 THEN
@@ -202,9 +189,8 @@ DELIMITER ;
 -- Table structure for table `loans`
 --
 
-DROP TABLE IF EXISTS `loans`;
 CREATE TABLE `loans` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
   `book_id` bigint UNSIGNED NOT NULL,
   `loan_date` date NOT NULL,
@@ -212,8 +198,7 @@ CREATE TABLE `loans` (
   `status` enum('pending','approved','rejected','borrowed','returned','pending_return') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `quantity` int NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -256,7 +241,6 @@ INSERT INTO `loans` (`id`, `user_id`, `book_id`, `loan_date`, `due_date`, `statu
 --
 -- Triggers `loans`
 --
-DROP TRIGGER IF EXISTS `trg_before_insert_loan`;
 DELIMITER $$
 CREATE TRIGGER `trg_before_insert_loan` BEFORE INSERT ON `loans` FOR EACH ROW BEGIN
                 DECLARE overdue_count INT;
@@ -279,15 +263,13 @@ DELIMITER ;
 -- Table structure for table `membership_cards`
 --
 
-DROP TABLE IF EXISTS `membership_cards`;
 CREATE TABLE `membership_cards` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` bigint UNSIGNED NOT NULL,
   `card_number` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `issued_date` date NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -296,12 +278,10 @@ CREATE TABLE `membership_cards` (
 -- Table structure for table `migrations`
 --
 
-DROP TABLE IF EXISTS `migrations`;
 CREATE TABLE `migrations` (
   `id` int UNSIGNED NOT NULL,
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `batch` int NOT NULL,
-  PRIMARY KEY (`id`)
+  `batch` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -325,12 +305,10 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 -- Table structure for table `model_has_permissions`
 --
 
-DROP TABLE IF EXISTS `model_has_permissions`;
 CREATE TABLE `model_has_permissions` (
   `permission_id` bigint UNSIGNED NOT NULL,
   `model_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `model_id` bigint UNSIGNED NOT NULL,
-  PRIMARY KEY (`permission_id`)
+  `model_id` bigint UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -339,13 +317,10 @@ CREATE TABLE `model_has_permissions` (
 -- Table structure for table `model_has_roles`
 --
 
-DROP TABLE IF EXISTS `model_has_roles`;
 CREATE TABLE `model_has_roles` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `role_id` bigint UNSIGNED NOT NULL,
   `model_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `model_id` bigint UNSIGNED NOT NULL,
-  PRIMARY KEY (`id`)
+  `model_id` bigint UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -365,13 +340,10 @@ INSERT INTO `model_has_roles` (`role_id`, `model_type`, `model_id`) VALUES
 -- Table structure for table `password_reset_tokens`
 --
 
-DROP TABLE IF EXISTS `password_reset_tokens`;
 CREATE TABLE `password_reset_tokens` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `created_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -380,14 +352,12 @@ CREATE TABLE `password_reset_tokens` (
 -- Table structure for table `permissions`
 --
 
-DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE `permissions` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` bigint UNSIGNED NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `guard_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -410,15 +380,13 @@ INSERT INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at
 -- Table structure for table `returns`
 --
 
-DROP TABLE IF EXISTS `returns`;
 CREATE TABLE `returns` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` bigint UNSIGNED NOT NULL,
   `loan_id` bigint UNSIGNED NOT NULL,
   `actual_return_date` date NOT NULL,
   `fine` decimal(10,2) NOT NULL DEFAULT '0.00',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -451,7 +419,6 @@ INSERT INTO `returns` (`id`, `loan_id`, `actual_return_date`, `fine`, `created_a
 --
 -- Triggers `returns`
 --
-DROP TRIGGER IF EXISTS `trg_process_return_details`;
 DELIMITER $$
 CREATE TRIGGER `trg_process_return_details` AFTER INSERT ON `returns` FOR EACH ROW BEGIN
                 UPDATE loans
@@ -467,14 +434,12 @@ DELIMITER ;
 -- Table structure for table `roles`
 --
 
-DROP TABLE IF EXISTS `roles`;
 CREATE TABLE `roles` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` bigint UNSIGNED NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `guard_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -492,12 +457,9 @@ INSERT INTO `roles` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VAL
 -- Table structure for table `role_has_permissions`
 --
 
-DROP TABLE IF EXISTS `role_has_permissions`;
 CREATE TABLE `role_has_permissions` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `permission_id` bigint UNSIGNED NOT NULL,
-  `role_id` bigint UNSIGNED NOT NULL,
-  PRIMARY KEY (`id`)
+  `role_id` bigint UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -526,15 +488,13 @@ INSERT INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
 -- Table structure for table `sessions`
 --
 
-DROP TABLE IF EXISTS `sessions`;
 CREATE TABLE `sessions` (
   `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint UNSIGNED DEFAULT NULL,
   `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_agent` text COLLATE utf8mb4_unicode_ci,
   `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `last_activity` int NOT NULL,
-  PRIMARY KEY (`id`)
+  `last_activity` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -543,17 +503,15 @@ CREATE TABLE `sessions` (
 -- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` bigint UNSIGNED NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `photo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -573,6 +531,14 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`, `photo`, `remember_token
 -- Stand-in structure for view `v_active_loans`
 -- (See below for the actual view)
 --
+CREATE TABLE `v_active_loans` (
+`loan_id` bigint unsigned
+,`user_name` varchar(255)
+,`book_title` varchar(255)
+,`loan_date` date
+,`due_date` date
+,`quantity` int
+);
 
 -- --------------------------------------------------------
 
@@ -580,6 +546,15 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`, `photo`, `remember_token
 -- Stand-in structure for view `v_book_catalog`
 -- (See below for the actual view)
 --
+CREATE TABLE `v_book_catalog` (
+`book_id` bigint unsigned
+,`title` varchar(255)
+,`author` varchar(255)
+,`publisher` varchar(255)
+,`cover_image` varchar(255)
+,`total_stock` int
+,`available_stock` decimal(33,0)
+);
 
 -- --------------------------------------------------------
 
@@ -587,6 +562,14 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`, `photo`, `remember_token
 -- Stand-in structure for view `v_overdue_loans`
 -- (See below for the actual view)
 --
+CREATE TABLE `v_overdue_loans` (
+`loan_id` bigint unsigned
+,`user_name` varchar(255)
+,`book_title` varchar(255)
+,`due_date` date
+,`days_overdue` int
+,`estimated_fine` bigint
+);
 
 --
 -- Indexes for dumped tables
@@ -595,11 +578,14 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`, `photo`, `remember_token
 --
 -- Indexes for table `books`
 --
+ALTER TABLE `books`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `loans`
 --
 ALTER TABLE `loans`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `loans_user_id_foreign` (`user_id`),
   ADD KEY `loans_book_id_foreign` (`book_id`);
 
@@ -607,57 +593,69 @@ ALTER TABLE `loans`
 -- Indexes for table `membership_cards`
 --
 ALTER TABLE `membership_cards`
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `membership_cards_card_number_unique` (`card_number`),
   ADD KEY `membership_cards_user_id_foreign` (`user_id`);
 
 --
 -- Indexes for table `migrations`
 --
+ALTER TABLE `migrations`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `model_has_permissions`
 --
 ALTER TABLE `model_has_permissions`
+  ADD PRIMARY KEY (`permission_id`,`model_id`,`model_type`),
   ADD KEY `model_has_permissions_model_id_model_type_index` (`model_id`,`model_type`);
 
 --
 -- Indexes for table `model_has_roles`
 --
 ALTER TABLE `model_has_roles`
+  ADD PRIMARY KEY (`role_id`,`model_id`,`model_type`),
   ADD KEY `model_has_roles_model_id_model_type_index` (`model_id`,`model_type`);
 
 --
 -- Indexes for table `password_reset_tokens`
 --
+ALTER TABLE `password_reset_tokens`
+  ADD PRIMARY KEY (`email`);
 
 --
 -- Indexes for table `permissions`
 --
 ALTER TABLE `permissions`
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `permissions_name_guard_name_unique` (`name`,`guard_name`);
 
 --
 -- Indexes for table `returns`
 --
 ALTER TABLE `returns`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `returns_loan_id_foreign` (`loan_id`);
 
 --
 -- Indexes for table `roles`
 --
 ALTER TABLE `roles`
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `roles_name_guard_name_unique` (`name`,`guard_name`);
 
 --
 -- Indexes for table `role_has_permissions`
 --
 ALTER TABLE `role_has_permissions`
+  ADD PRIMARY KEY (`permission_id`,`role_id`),
   ADD KEY `role_has_permissions_role_id_foreign` (`role_id`);
 
 --
 -- Indexes for table `sessions`
 --
 ALTER TABLE `sessions`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `sessions_user_id_index` (`user_id`),
   ADD KEY `sessions_last_activity_index` (`last_activity`);
 
@@ -665,6 +663,7 @@ ALTER TABLE `sessions`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `users_email_unique` (`email`);
 
 --
@@ -726,8 +725,7 @@ ALTER TABLE `users`
 --
 DROP TABLE IF EXISTS `v_active_loans`;
 
-DROP VIEW IF EXISTS `v_active_loans`;
-CREATE ALGORITHM=UNDEFINED VIEW `v_active_loans`  AS SELECT `l`.`id` AS `loan_id`, `u`.`name` AS `user_name`, `b`.`title` AS `book_title`, `l`.`loan_date` AS `loan_date`, `l`.`due_date` AS `due_date`, `l`.`quantity` AS `quantity` FROM (((`loans` `l` join `users` `u` on((`l`.`user_id` = `u`.`id`))) join `books` `b` on((`l`.`book_id` = `b`.`id`))) left join `returns` `r` on((`l`.`id` = `r`.`loan_id`))) WHERE (`r`.`id` is null) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_active_loans`  AS SELECT `l`.`id` AS `loan_id`, `u`.`name` AS `user_name`, `b`.`title` AS `book_title`, `l`.`loan_date` AS `loan_date`, `l`.`due_date` AS `due_date`, `l`.`quantity` AS `quantity` FROM (((`loans` `l` join `users` `u` on((`l`.`user_id` = `u`.`id`))) join `books` `b` on((`l`.`book_id` = `b`.`id`))) left join `returns` `r` on((`l`.`id` = `r`.`loan_id`))) WHERE (`r`.`id` is null) ;
 
 -- --------------------------------------------------------
 
@@ -736,8 +734,7 @@ CREATE ALGORITHM=UNDEFINED VIEW `v_active_loans`  AS SELECT `l`.`id` AS `loan_id
 --
 DROP TABLE IF EXISTS `v_book_catalog`;
 
-DROP VIEW IF EXISTS `v_book_catalog`;
-CREATE ALGORITHM=UNDEFINED VIEW `v_book_catalog`  AS SELECT `b`.`id` AS `book_id`, `b`.`title` AS `title`, `b`.`author` AS `author`, `b`.`publisher` AS `publisher`, `b`.`cover_image` AS `cover_image`, `b`.`stock` AS `total_stock`, (`b`.`stock` - coalesce((select sum(`l`.`quantity`) from `loans` `l` where ((`l`.`book_id` = `b`.`id`) and (`l`.`status` in ('approved','borrowed','pending_return')))),0)) AS `available_stock` FROM `books` AS `b` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_book_catalog`  AS SELECT `b`.`id` AS `book_id`, `b`.`title` AS `title`, `b`.`author` AS `author`, `b`.`publisher` AS `publisher`, `b`.`cover_image` AS `cover_image`, `b`.`stock` AS `total_stock`, (`b`.`stock` - coalesce((select sum(`l`.`quantity`) from `loans` `l` where ((`l`.`book_id` = `b`.`id`) and (`l`.`status` in ('approved','borrowed','pending_return')))),0)) AS `available_stock` FROM `books` AS `b` ;
 
 -- --------------------------------------------------------
 
@@ -746,8 +743,7 @@ CREATE ALGORITHM=UNDEFINED VIEW `v_book_catalog`  AS SELECT `b`.`id` AS `book_id
 --
 DROP TABLE IF EXISTS `v_overdue_loans`;
 
-DROP VIEW IF EXISTS `v_overdue_loans`;
-CREATE ALGORITHM=UNDEFINED VIEW `v_overdue_loans`  AS SELECT `l`.`id` AS `loan_id`, `u`.`name` AS `user_name`, `b`.`title` AS `book_title`, `l`.`due_date` AS `due_date`, (to_days(curdate()) - to_days(`l`.`due_date`)) AS `days_overdue`, ((to_days(curdate()) - to_days(`l`.`due_date`)) * 5000) AS `estimated_fine` FROM (((`loans` `l` join `users` `u` on((`l`.`user_id` = `u`.`id`))) join `books` `b` on((`l`.`book_id` = `b`.`id`))) left join `returns` `r` on((`l`.`id` = `r`.`loan_id`))) WHERE ((`r`.`id` is null) AND (`l`.`due_date` < curdate())) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_overdue_loans`  AS SELECT `l`.`id` AS `loan_id`, `u`.`name` AS `user_name`, `b`.`title` AS `book_title`, `l`.`due_date` AS `due_date`, (to_days(curdate()) - to_days(`l`.`due_date`)) AS `days_overdue`, ((to_days(curdate()) - to_days(`l`.`due_date`)) * 5000) AS `estimated_fine` FROM (((`loans` `l` join `users` `u` on((`l`.`user_id` = `u`.`id`))) join `books` `b` on((`l`.`book_id` = `b`.`id`))) left join `returns` `r` on((`l`.`id` = `r`.`loan_id`))) WHERE ((`r`.`id` is null) AND (`l`.`due_date` < curdate())) ;
 
 --
 -- Constraints for dumped tables
