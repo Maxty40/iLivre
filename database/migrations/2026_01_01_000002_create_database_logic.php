@@ -52,7 +52,7 @@ return new class extends Migration
                 b.title AS book_title,
                 l.due_date,
                 DATEDIFF(CURDATE(), l.due_date) AS days_overdue,
-                (DATEDIFF(CURDATE(), l.due_date) * 5000) AS estimated_fine
+                (DATEDIFF(CURDATE(), l.due_date) * 2000) AS estimated_fine
             FROM loans l
             JOIN users u ON l.user_id = u.id
             JOIN books b ON l.book_id = b.id
@@ -201,7 +201,7 @@ return new class extends Migration
                 SELECT due_date INTO v_due_date FROM loans WHERE id = p_loan_id;
 
                 SET v_days_late = GREATEST(0, DATEDIFF(CURDATE(), v_due_date));
-                SET v_fine = v_days_late * 5000;
+                SET v_fine = v_days_late * 2000;
 
                 INSERT INTO returns (loan_id, actual_return_date, fine, created_at, updated_at)
                 VALUES (p_loan_id, CURDATE(), v_fine, NOW(), NOW());

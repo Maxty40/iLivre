@@ -207,7 +207,7 @@
                                                                 class="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 text-sm text-red-700">
                                                                 ⚠ Buku ini terlambat <strong>{{ $daysOverdue }}
                                                                     hari</strong>. Denda estimasi: <strong>Rp
-                                                                    {{ number_format($daysOverdue * 5000, 0, ',', '.') }}</strong>
+                                                                    {{ number_format($daysOverdue * 2000, 0, ',', '.') }}</strong>
                                                             </div>
                                                         @endif
 
